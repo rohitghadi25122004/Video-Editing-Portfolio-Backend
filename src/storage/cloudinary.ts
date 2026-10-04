@@ -46,6 +46,13 @@ export function createCloudinaryStorage(options: CloudinaryOptions): Storage {
   const docId = `${folder}/content/items.json`;
   const basicAuth = `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString("base64")}`;
 
+  /**
+   * Media Library folder for an upload. Accounts on dynamic folders (all new
+   * ones) file assets by asset_folder, not by the public_id path; accounts on
+   * fixed folders ignore it and use the path.
+   */
+  const assetFolder = (publicId: string) => publicId.slice(0, publicId.lastIndexOf("/"));
+
   const signed = (params: Record<string, string>) => {
     const all = { ...params, timestamp: String(Math.floor(Date.now() / 1000)) };
     return { ...all, api_key: apiKey, signature: cloudinarySignature(all, apiSecret) };
@@ -78,7 +85,7 @@ export function createCloudinaryStorage(options: CloudinaryOptions): Storage {
     },
 
     async writeDoc(json) {
-      const fields = signed({ public_id: docId, overwrite: "true", invalidate: "true" });
+      const fields = signed({ public_id: docId, asset_folder: assetFolder(docId), overwrite: "true", invalidate: "true" });
       await call(`${api}/raw/upload`, {
         method: "POST",
         body: form(fields, new Blob([json], { type: "application/json" }), "items.json"),
@@ -94,7 +101,8 @@ export function createCloudinaryStorage(options: CloudinaryOptions): Storage {
         resource === "video"
           ? `${delivery}/video/upload/${publicId}.${ext}`
           : `${delivery}/image/upload/${COVER_TRANSFORM}/${publicId}.${ext}`;
-      return { method: "POST", url: `${api}/${resource}/upload`, fields: signed({ public_id: publicId }), publicUrl };
+      const fields = signed({ public_id: publicId, asset_folder: assetFolder(publicId) });
+      return { method: "POST", url: `${api}/${resource}/upload`, fields, publicUrl };
     },
 
     keyFromUrl(url) {

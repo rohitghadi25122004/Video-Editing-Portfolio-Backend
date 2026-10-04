@@ -8,7 +8,7 @@ try {
 }
 
 const blankToUndefined = (value: unknown) => (typeof value === "string" && value.trim() === "" ? undefined : value);
-const optional = z.preprocess(blankToUndefined, z.string().optional());
+const optional = z.preprocess(blankToUndefined, z.string().trim().optional());
 const origin = z.string().regex(/^https?:\/\/[^/\s]+$/, "must be an origin like https://example.com (no trailing slash)");
 
 const schema = z
