@@ -265,12 +265,11 @@ function openEditor(item = null) {
   $("#editor-title").textContent = item ? "Edit video" : "Add video";
   $("#save").textContent = item ? "Save changes" : "Add video";
 
-  const known = new Set(item?.tools ?? []);
-  $("#tool-options").replaceChildren(
-    ...TOOLS.map((tool) =>
-      el("label", { className: "chip" }, [el("input", { type: "checkbox", name: "tools", value: tool, checked: known.has(tool) }), icon("check"), tool]),
-    ),
-  );
+  // Offer the standard tools plus every tool already used on any video.
+  const selected = new Set(item?.tools ?? []);
+  const options = [...new Set([...TOOLS, ...items.flatMap((i) => i.tools), ...selected])];
+  $("#tool-options").replaceChildren(...options.map((tool) => toolChip(tool, selected.has(tool))));
+  $("#new-tool").value = "";
 
   if (item) {
     form.format.value = item.format;
@@ -278,7 +277,6 @@ function openEditor(item = null) {
     form.description.value = item.description ?? "";
     form.categories.value = item.categories.join(", ");
     form.language.value = item.language ?? "";
-    form.otherTools.value = item.tools.filter((t) => !TOOLS.includes(t)).join(", ");
     form.sourceType.value = item.source.type;
     if (item.source.type === "drive") form.driveUrl.value = item.source.embedUrl;
     form.approved.checked = item.approved;
@@ -296,6 +294,26 @@ function openEditor(item = null) {
   syncEditor();
   editor.showModal();
   form.label.focus();
+}
+
+function toolChip(tool, checked) {
+  return el("label", { className: "chip" }, [el("input", { type: "checkbox", name: "tools", value: tool, checked }), icon("check"), tool]);
+}
+
+/** Adds the typed tool as a selected chip, or selects it if it is already there. */
+function addTool() {
+  const input = $("#new-tool");
+  const name = input.value.trim().replace(/\s+/g, " ").replace(/[\u2013\u2014]/g, "-");
+  if (!name) return input.focus();
+  const boxes = [...form.querySelectorAll('input[name="tools"]')];
+  const existing = boxes.find((b) => b.value.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    existing.checked = true;
+  } else {
+    $("#tool-options").append(toolChip(name, true));
+  }
+  input.value = "";
+  input.focus();
 }
 
 const list = (value) =>
@@ -443,7 +461,7 @@ async function save() {
     description: form.description.value.trim() || null,
     categories: list(form.categories.value),
     language: form.language.value.trim() || null,
-    tools: [...form.querySelectorAll('input[name="tools"]:checked')].map((b) => b.value).concat(list(form.otherTools.value)),
+    tools: [...form.querySelectorAll('input[name="tools"]:checked')].map((b) => b.value),
     source,
     cover,
     coverSize,
@@ -518,6 +536,15 @@ form.addEventListener("submit", async (e) => {
   } finally {
     button.disabled = false;
     $("#progress").hidden = true;
+  }
+});
+
+$("#add-tool").addEventListener("click", addTool);
+$("#new-tool").addEventListener("keydown", (e) => {
+  // Enter adds the tool instead of submitting the whole form.
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addTool();
   }
 });
 

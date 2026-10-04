@@ -139,10 +139,15 @@
           <fieldset class="group">
             <legend class="group-label">Tools</legend>
             <div class="chip-pick" id="tool-options"></div>
-            <label class="field">
-              <span class="field-label">Other tools <span class="optional">comma separated</span></span>
-              <input class="input" name="otherTools" placeholder="DaVinci Resolve" />
-            </label>
+            <div class="tool-add">
+              <label class="sr-only" for="new-tool">Add a tool</label>
+              <input class="input" id="new-tool" maxlength="40" autocomplete="off" placeholder="Add a tool, e.g. DaVinci Resolve" />
+              <button type="button" class="btn btn-outline btn-sm" id="add-tool">
+                <svg class="icon" aria-hidden="true"><use href="icons.svg#plus" /></svg>
+                Add
+              </button>
+            </div>
+            <small class="hint">Tap a tool to turn it on or off. New tools are remembered for the next video.</small>
           </fieldset>
 
           <fieldset class="group">

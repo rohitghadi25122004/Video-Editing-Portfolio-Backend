@@ -840,6 +840,27 @@ textarea.input {
   display: block;
 }
 
+/* add-a-tool row */
+.tool-add {
+  display: flex;
+  gap: 0.5rem;
+}
+.tool-add .input {
+  flex: 1;
+  min-width: 0;
+}
+.tool-add .btn {
+  height: 3rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* segmented control */
 .segmented {
   display: inline-grid;
