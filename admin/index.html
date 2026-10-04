@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin, Vasant Gawade</title>
+    <script src="theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Geist:wght@400..600&display=swap"
+    />
+    <link rel="stylesheet" href="admin.css" />
+    <script type="module" src="admin.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-name">Vasant Gawade</span>
+        <span class="brand-tag">Admin</span>
+      </div>
+      <nav class="topbar-actions" aria-label="Account">
+        <a class="btn btn-outline btn-sm" id="site-link" target="_blank" rel="noopener" hidden>
+          <svg class="icon" aria-hidden="true"><use href="icons.svg#arrow-out" /></svg>
+          <span class="hide-sm">View site</span>
+        </a>
+        <button type="button" class="btn-icon" id="theme-toggle" aria-label="Switch to dark theme">
+          <svg class="icon" aria-hidden="true"><use href="icons.svg#moon" /></svg>
+        </button>
+        <button type="button" class="btn-icon" id="logout" aria-label="Sign out" title="Sign out" hidden>
+          <svg class="icon" aria-hidden="true"><use href="icons.svg#sign-out" /></svg>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Sign in: the one chartreuse field on this screen -->
+      <section id="login-view" class="login" hidden aria-labelledby="login-title">
+        <div class="login-field">
+          <h1 id="login-title" class="display">Manage<br />the work</h1>
+          <p class="login-lead">Add, edit and order the videos on the portfolio.</p>
+          <form id="login-form" class="login-form">
+            <label class="field">
+              <span class="field-label">Password</span>
+              <span class="input-wrap">
+                <svg class="icon input-icon" aria-hidden="true"><use href="icons.svg#lock" /></svg>
+                <input class="input" type="password" name="password" autocomplete="current-password" required />
+              </span>
+            </label>
+            <p class="login-error" id="login-error" role="alert"></p>
+            <button type="submit" class="btn btn-primary">Sign in</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Video list -->
+      <section id="list-view" class="list" hidden aria-labelledby="list-title">
+        <div class="list-head">
+          <div>
+            <h1 id="list-title" class="headline">Videos</h1>
+            <p class="muted" id="list-summary" aria-live="polite"></p>
+          </div>
+          <button type="button" class="btn btn-field" id="add-item">
+            <svg class="icon" aria-hidden="true"><use href="icons.svg#plus" /></svg>
+            Add video
+          </button>
+        </div>
+
+        <div id="skeleton" class="panel" aria-hidden="true">
+          <div class="row skeleton"><span class="sk-thumb"></span><span class="sk-lines"><i></i><i></i></span></div>
+          <div class="row skeleton"><span class="sk-thumb"></span><span class="sk-lines"><i></i><i></i></span></div>
+          <div class="row skeleton"><span class="sk-thumb"></span><span class="sk-lines"><i></i><i></i></span></div>
+        </div>
+
+        <div id="empty" class="empty" hidden>
+          <svg class="icon empty-icon" aria-hidden="true"><use href="icons.svg#film" /></svg>
+          <h2>No videos yet</h2>
+          <p class="muted">
+            Add your first short or long-form edit. To bring in the videos already on the site, run
+            <code>npm run seed</code> in the backend folder.
+          </p>
+          <button type="button" class="btn btn-primary btn-sm" id="empty-add">Add video</button>
+        </div>
+
+        <div id="groups"></div>
+      </section>
+    </main>
+
+    <!-- Add / edit: a sheet from the right, full screen on phones -->
+    <dialog id="editor" class="sheet" aria-labelledby="editor-title">
+      <form id="item-form" class="sheet-form" novalidate>
+        <header class="sheet-head">
+          <h2 id="editor-title">Add video</h2>
+          <button type="button" class="btn-icon" id="close-editor" aria-label="Close">
+            <svg class="icon" aria-hidden="true"><use href="icons.svg#x" /></svg>
+          </button>
+        </header>
+
+        <div class="sheet-body">
+          <fieldset class="group">
+            <legend class="group-label">Format</legend>
+            <div class="format-pick">
+              <label class="format-option">
+                <input type="radio" name="format" value="short" checked />
+                <span class="shape shape-short" aria-hidden="true"></span>
+                <span><strong>Short</strong><small>Vertical 9:16</small></span>
+              </label>
+              <label class="format-option">
+                <input type="radio" name="format" value="long-form" />
+                <span class="shape shape-long" aria-hidden="true"></span>
+                <span><strong>Long-form</strong><small>Horizontal 16:9</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="group">
+            <label class="field">
+              <span class="field-label">Title</span>
+              <input class="input" name="label" maxlength="80" required placeholder="Explanation Reel" />
+            </label>
+            <label class="field">
+              <span class="field-label">Description <span class="optional">optional</span></span>
+              <textarea class="input" name="description" maxlength="300" rows="2"></textarea>
+            </label>
+            <div class="field-pair">
+              <label class="field">
+                <span class="field-label">Categories <span class="optional">comma separated</span></span>
+                <input class="input" name="categories" placeholder="Explainer, Motion Graphics" />
+              </label>
+              <label class="field">
+                <span class="field-label">Spoken language</span>
+                <input class="input" name="language" placeholder="Hindi" />
+              </label>
+            </div>
+          </div>
+
+          <fieldset class="group">
+            <legend class="group-label">Tools</legend>
+            <div class="chip-pick" id="tool-options"></div>
+            <label class="field">
+              <span class="field-label">Other tools <span class="optional">comma separated</span></span>
+              <input class="input" name="otherTools" placeholder="DaVinci Resolve" />
+            </label>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend class="group-label">Video</legend>
+            <div class="segmented" role="radiogroup" aria-label="Video source">
+              <label><input type="radio" name="sourceType" value="mp4" checked /><span>Upload MP4</span></label>
+              <label><input type="radio" name="sourceType" value="drive" /><span>Google Drive link</span></label>
+            </div>
+            <div data-source="mp4">
+              <label class="drop" id="video-drop">
+                <input type="file" name="video" accept="video/mp4" />
+                <svg class="icon drop-icon" aria-hidden="true"><use href="icons.svg#upload" /></svg>
+                <span class="drop-text">
+                  <strong id="video-name">Choose an MP4 or drop it here</strong>
+                  <small id="video-meta">H.264 web copy, ideally under 10 MB</small>
+                </span>
+              </label>
+            </div>
+            <div data-source="drive" hidden>
+              <label class="field">
+                <span class="field-label">Drive link</span>
+                <span class="input-wrap">
+                  <svg class="icon input-icon" aria-hidden="true"><use href="icons.svg#link" /></svg>
+                  <input class="input" name="driveUrl" placeholder="https://drive.google.com/file/d/..." />
+                </span>
+                <small class="hint">Share the file as "Anyone with the link can view".</small>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend class="group-label">Cover</legend>
+            <label class="drop drop-cover" id="cover-drop">
+              <input type="file" name="cover" accept="image/webp,image/jpeg,image/png" />
+              <span class="cover-frame" id="cover-frame">
+                <svg class="icon" aria-hidden="true"><use href="icons.svg#image" /></svg>
+              </span>
+              <span class="drop-text">
+                <strong id="cover-name">Choose a cover image</strong>
+                <small id="cover-hint">WebP or JPEG. Leave empty to use a frame from the video.</small>
+              </span>
+            </label>
+          </fieldset>
+
+          <label class="switch-row" id="hero-row">
+            <span>
+              <strong>Feature in the hero</strong>
+              <small>Plays as the hero loop and the Watch reel button. MP4 only, one video at a time.</small>
+            </span>
+            <input type="checkbox" name="approved" class="switch" role="switch" />
+          </label>
+        </div>
+
+        <footer class="sheet-foot">
+          <div class="alert" id="form-error" role="alert" hidden>
+            <svg class="icon" aria-hidden="true"><use href="icons.svg#warning" /></svg>
+            <span></span>
+          </div>
+          <div class="progress" id="progress" hidden>
+            <div class="progress-fill"></div>
+            <span class="progress-text"></span>
+          </div>
+          <div class="sheet-actions">
+            <button type="button" class="btn btn-outline btn-sm" id="cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm" id="save">Save video</button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Delete confirmation -->
+    <dialog id="confirm" class="confirm" aria-labelledby="confirm-title">
+      <form method="dialog">
+        <h2 id="confirm-title">Delete video?</h2>
+        <p class="muted" id="confirm-text"></p>
+        <div class="sheet-actions">
+          <button value="cancel" class="btn btn-outline btn-sm">Keep it</button>
+          <button value="delete" class="btn btn-danger btn-sm">Delete</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
